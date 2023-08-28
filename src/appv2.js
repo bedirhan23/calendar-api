@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
-import './index.css';
+import './App.css';
 import { Login } from './Login';
-import { Register} from './Registerv2';
-import MyCalendar from './Calendar';
-import { Route } from 'react-router-dom';
+import { Register} from './Register'
 
 function App() {
   const [currentForm, setCurrentForm] = useState('login');
+  const initialValues = {username: "", email: "", password: ""}; //
+  const [formValues, setFormValues] = useState(initialValues); //
 
   const toggleForm = (formName) => {
     setCurrentForm(formName);
@@ -15,9 +15,7 @@ function App() {
   return (
     <div className="App">
       {
-        
-        currentForm === "login" ? <Login onFormSwitch={toggleForm} /> : <Register onFormSwitch={toggleForm}/> 
-        
+        currentForm === "login" ? <Login onFormSwitch={toggleForm} /> : <Register onFormSwitch={toggleForm}/>
       }
       
     </div>
@@ -25,4 +23,3 @@ function App() {
 }
 
 export default App;
-

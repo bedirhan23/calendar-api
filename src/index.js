@@ -1,13 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
+import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
 import './index.css';
 import App from './App';
+import './App.css';
 import reportWebVitals from './reportWebVitals';
+import  {Login}  from './Login';
+import  MyCalendar  from './Calendar';
+import { Register } from './Registerv2';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Routes>
+        <Route exact path='/' element = {<Login />}/>
+        <Route exact path='/login' element = {<Login />}/>
+        <Route exact path='/calendar' element = {<MyCalendar />}/>
+        <Route exact path='/register' element = {<Register />}/>
+
+
+      </Routes>
+    </Router>
   </React.StrictMode>
 );
 
