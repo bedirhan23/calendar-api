@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "css-loader": "^6.8.1",
     "react-router-dom": "^6.15.0"
   }
 }

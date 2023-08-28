@@ -1,4 +1,4 @@
-.App {
+.app {
   text-align: center;
   display: flex;
   min-height: 100vh;
@@ -6,16 +6,27 @@
   justify-content: center;
   position: relative;
   
-  background: url('./00a0f-sw-531542.png') ; 
-  background-size: cover;
+  /*background: url('./00a0f-sw-531542.png') ;    
+  background-size: cover;*/
   
 }
 
-.auth-form-container, .login-form, .register-form{
+.authFormContainer, .registerForm{
   display: flex;
   flex-direction: column; 
   align-items: center;
+  background: url('./00a0f-sw-531542.png');
+  background-size: cover;
   /*padding: 5rem;*/
+}
+
+.loginForm{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: chartreuse;
+  
+
 }
 
 /* @media  and (min-width 600px) {
@@ -30,20 +41,21 @@
 
 
 
-label{
+.label{
   text-align: left;
   padding: 0.25rem 0;
+  
 
 }
 
-input {
+.input {
   margin: 0.5em 0;
   padding: 1rem;
   border: none;
   border-radius: 10px;
 }
 
-button {
+.button {
   border: none;
   background-color: white;
   padding: 20px;
@@ -51,9 +63,9 @@ button {
   cursor: pointer;
 }
 
-.link-btn{
-  background: none;
-  color: rgb(46, 58, 22);
+.linkBtn{
+  background: rebeccapurple;
+  color: rgb(154, 225, 39);
   text-decoration: underline;
 }
 

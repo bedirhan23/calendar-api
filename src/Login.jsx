@@ -1,8 +1,11 @@
 import React, { useState, useEffect} from "react";
-import './index.css';
 import './App.css';
+import './index.css';
+
 import { useNavigate } from "react-router-dom";
 export const Login = (props) => {
+
+    //console.log("test2113", styles);
 
     const navigate = useNavigate();
     const initialValues = { email: "", password: ""}; //
@@ -56,11 +59,11 @@ export const Login = (props) => {
     }
 
     return (
-        <div className="auth-form-container">
+        <div className="authFormContainer">
             {/*<pre>{ JSON.stringify(formValues, undefined, 2)}</pre>*/}
             <h2>Login</h2>
             
-            <form className= "login-form" onSubmit={handleSubmit}>
+            <form className="loginForm" onSubmit={handleSubmit}>
                 <label htmlFor="email">Email</label>
                 <input type="text" name="email" placeholder="youremail@gmail.com" value={formValues.email} onChange={handleChange}></input>
                 <p>{formErrors.email }</p>
@@ -72,7 +75,7 @@ export const Login = (props) => {
                 {/* <button onClick={() => navigate('/calendar')}>Go to Calendar</button> */}
 
             </form>
-            <button className= "link-btn" onClick={() => props.onFormSwitch('register')}>Don't have an account? Register here.</button>
+            <button className="linkBtn" onClick={() => props.onFormSwitch('register')}>Don't have an account? Register here.</button>
         </div>
     )
 }
