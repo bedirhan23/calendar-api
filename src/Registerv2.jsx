@@ -61,24 +61,55 @@ export const Register = (props) => {
     }
 
     return (
-        <div className="auth-form-container">
+        <div className="authFormContainer">
             {/*<pre>{ JSON.stringify(formValues, undefined, 2)}</pre>*/}
             <h2>Register</h2>
             
             <form className= "registerForm" onSubmit={handleSubmit}>
-                <label htmlFor="fullname">fullname</label>
-                <input type="text" name="fullname" placeholder="Full Name" value={formValues.fullname} onChange={handleChange}></input>
-                <p>{formErrors.fullname }</p>
-                <label htmlFor="email">email</label>
-                <input type="text" name="email" placeholder="youremail@gmail.com" value={formValues.email} onChange={handleChange}></input>
-                <p>{formErrors.email }</p>
-                <label htmlFor="password">password</label>
-                <input type="password" name="password" placeholder="**********" value={formValues.password} onChange={handleChange}></input>
-                {/*<i class = "far fa-eye" style="margin-left: -30px; cursor: pointer;"></i>*/}
-                <p>{formErrors.password }</p>
-                <button>Register</button>
+                <label htmlFor="fullName">Full Name</label>
+                <div className="input-container">
+                {/*<img src={userIcon} alt="User" className="icon" />*/}
+                <input
+                    type="text"
+                    name="fullName"
+                    placeholder="Your Name"
+                    value={formValues.fullname}
+                    onChange={handleChange}
+                    className="input"
+                />
+                </div>
+                <p>{formErrors.fullname}</p>
+
+                <label htmlFor="email">Email</label>
+                <div className="input-container">
+                {/*<img src={userIcon} alt="User" className="icon" />*/}
+                <input
+                    type="text"
+                    name="email"
+                    placeholder="youremail@gmail.com"
+                    value={formValues.email}
+                    onChange={handleChange}
+                    className="input"
+                />
+                </div>
+                <p>{formErrors.email}</p>
+
+                <label htmlFor="password">Password</label>
+                <div className="input-container">
+                {/*<img src={userIcon} alt="User" className="icon" />*/}
+                <input
+                    type="text"
+                    name="password"
+                    placeholder="************"
+                    value={formValues.password}
+                    onChange={handleChange}
+                    className="input"
+                />
+                </div>
+                <p>{formErrors.email}</p>
+                <button className="button">Register</button>
             </form>
-            <button className= "linkBtn" onClick={() => navigate('/register')}>Already have an account? Login here.</button>
+            <button className= "linkBtn" onClick={() => navigate('/login')}>Already have an account? Login here.</button>
         </div>
     )
 }

@@ -8,7 +8,7 @@ const localizer = momentLocalizer(moment);
 const MyCalendar = ({ events }) => {
     return (<div className="calendar-container">
         <h2>Calendar</h2>
-        <p>djgmskgnsfpgj</p>
+        {/*<p>djgmskgnsfpgj</p>*/}
         <Calendar
             localizer={localizer}
             events = {events}

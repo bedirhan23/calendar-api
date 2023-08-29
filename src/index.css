@@ -25,14 +25,18 @@
 
 .registerForm{
 
+  border: 2px solid salmon;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  background: transparent;
+  backdrop-filter: blur(20px);
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
-  background: url('./00a0f-sw-531542.png' );
-  /*opacity: 0.5;*/
-  width: 100%;
-  height: 100vh;
-  background-size: cover;
+  border-radius: 5px;
+  width: 30%;
+  height: 50vh;
+ 
 
 }
 .loginForm{
@@ -51,6 +55,9 @@
 
 
 }
+.calendarForm{
+
+}
 
 /* @media  and (min-width 600px) {
 
@@ -67,6 +74,7 @@
 .label{
   text-align: left;
   padding: 0.25rem 0;
+  background-color: crimson;
 
   
 }
@@ -74,16 +82,17 @@
 .input{
   margin: 0.5em 0;
   padding: 1rem;
-  border: none;
+  border: 1px black;
   /*border-radius: 10px;*/
   border-radius: 5px;
-  background-color: blueviolet;
+  /*background-color: rgb(164, 136, 22); */
+  background: transparent;
 }
 
 .button {
   border: none;
   background-color: white;
-  padding: 20px;
+  padding: 15px;
   border-radius: 10px;
   cursor: pointer;
 }
@@ -92,4 +101,6 @@
   background: rgb(201, 135, 43);
   color: rgb(255, 255, 255);
   text-decoration: underline;
+  width: 50vh;
+  height: 5vh;
 }

@@ -10,7 +10,7 @@ import  {Login}  from './Login';
 import  MyCalendar  from './Calendar';
 import  {Register}  from './Registerv2';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root')); //ReactDOM.render yaparak düzelt
 root.render(
   <React.StrictMode>
     <Router>
