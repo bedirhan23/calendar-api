@@ -1,21 +1,27 @@
-import React from "react";
-import {Calendar, momentLocalizer} from 'react-big-calendar';
-import moment from 'moment';
-//import 'react-big-calendar/lib/css/react.big.calendar.css';
+import FullCalendar from "@fullcalendar/react";
+import daygridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { useState } from "react";
 
-const localizer = momentLocalizer(moment);
+export const MyCalendar = () => {
+  const [events, setEvents] = useState([]);
 
-const MyCalendar = ({ events }) => {
-    return (<div className="calendar-container">
-        <h2>Calendar</h2>
-        {/*<p>djgmskgnsfpgj</p>*/}
-        <Calendar
-            localizer={localizer}
-            events = {events}
-            startAccessor="start"
-            endAccessor="end"
-        />
-    </div>)
+  return (
+    <div>
+        <h1> </h1>
+      <FullCalendar
+        
+        editable
+        selectable
+        events={events}
+        headerToolbar={{
+          start: "today prev next",
+          end: "dayGridMonth dayGridWeek dayGridDay",
+        }}
+        plugins={[daygridPlugin, interactionPlugin]}
+        views={["dayGridMonth", "dayGridWeek", "dayGridDay"] } 
+        
+      />
+    </div>
+  );
 };
-
-export default MyCalendar;

@@ -59,16 +59,6 @@
 
 }
 
-/* @media  and (min-width 600px) {
-
-.auth-form-container{
-  padding: 5rem;
-  border: 1px solid white;
-  border-radius: 10px;
-}
-  
-} */
-
 
 
 .label{
@@ -82,11 +72,13 @@
 .input{
   margin: 0.5em 0;
   padding: 1rem;
-  border: 1px black;
+  outline: 0;
+  border: 1px solid rgb(1, 0, 2) ;
   /*border-radius: 10px;*/
   border-radius: 5px;
-  /*background-color: rgb(164, 136, 22); */
+  background-color: rgb(179, 27, 27); 
   background: transparent;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .button {
@@ -104,3 +96,13 @@
   width: 50vh;
   height: 5vh;
 }
+
+.input-container2{
+  margin: 0.5em 0;
+  padding: 1rem;
+  border: 10px rgb(1, 0, 2);
+  /*border-radius: 10px;*/
+  border-radius: 5px;
+  background-color: rgb(0, 0, 0); 
+  background: transparent;
+} 

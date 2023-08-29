@@ -7,7 +7,7 @@ import App from './App';
 //import './App.css';
 import reportWebVitals from './reportWebVitals';
 import  {Login}  from './Login';
-import  MyCalendar  from './Calendar';
+import  {MyCalendar}  from './Calendar';
 import  {Register}  from './Registerv2';
 
 const root = ReactDOM.createRoot(document.getElementById('root')); //ReactDOM.render yaparak düzelt

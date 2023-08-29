@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import styles from './index.css';
 import { Login } from './Login';
 import { Register} from './Registerv2';
-import MyCalendar from './Calendar';
+import {MyCalendar} from './Calendar';
 import { Route } from 'react-router-dom';
 
 
