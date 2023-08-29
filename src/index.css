@@ -11,21 +11,44 @@
   
 }
 
-.authFormContainer, .registerForm{
+.authFormContainer{
   display: flex;
   flex-direction: column; 
   align-items: center;
-  background: url('./00a0f-sw-531542.png');
+  background: url('./00a0f-sw-531542.png' );
+  /*opacity: 0.5;*/
+  width: 100%;
+  height: 100vh;
   background-size: cover;
   /*padding: 5rem;*/
 }
 
+.registerForm{
+
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  background: url('./00a0f-sw-531542.png' );
+  /*opacity: 0.5;*/
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+
+}
 .loginForm{
+  border: 2px solid salmon;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  background: transparent;
+  backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: chartreuse;
-  
+  border-radius: 5px;
+  width: 30%;
+  height: 50vh;
+  /*background-color: rgb(235, 183, 29);*/
+
 
 }
 
@@ -44,15 +67,17 @@
 .label{
   text-align: left;
   padding: 0.25rem 0;
-  
 
+  
 }
 
-.input {
+.input{
   margin: 0.5em 0;
   padding: 1rem;
   border: none;
-  border-radius: 10px;
+  /*border-radius: 10px;*/
+  border-radius: 5px;
+  background-color: blueviolet;
 }
 
 .button {
@@ -64,41 +89,7 @@
 }
 
 .linkBtn{
-  background: rebeccapurple;
-  color: rgb(154, 225, 39);
+  background: rgb(201, 135, 43);
+  color: rgb(255, 255, 255);
   text-decoration: underline;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-} */
-

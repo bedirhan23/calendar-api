@@ -17,8 +17,8 @@ function App() {
   return (
     <div className={styles.app}>
       {
-        
-        currentForm === "login" ? <Login onFormSwitch={toggleForm} /> : <Register onFormSwitch={toggleForm}/> 
+        //</Login onFormSwitch={toggleForm} />
+        currentForm === "login" 
         
       }
       
