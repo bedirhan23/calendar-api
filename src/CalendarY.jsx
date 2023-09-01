@@ -1,58 +1,117 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useRef } from "react";
+import FullCalendar from "@fullcalendar/react";
+import daygridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import {
+  Row,
+  Col,
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Container
+} from "reactstrap";
+import Select from "react-select";
+import DateRangePicker from "react-bootstrap-daterangepicker";
 
-const { dateFnsLocalizer, Calendar } = require("react-big-calendar")
+export const MyCalendar = () => {
 
+  const [weekendsVisible, setWeekendsVisible] = useState(true);
+  const [currentEvents, setCurrentEvents] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const calendarRef = useRef(null);
+  const [start, setStart] = useState(new Date());
+  const [end, setEnd] = useState(new Date());
+  const [events, setEvents] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [title, setTitle] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState();
+  const [eventC, setCreate] = useState("");
 
-const locales = {
+  const handleAddEventClick = () => {
+    setShowForm(true);
+  };
 
-    "tr-TR": require("date-fns/locale/tr-TR")
-}
+  
 
-const localizer = dateFnsLocalizer{
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
 
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales
-}
+    const newEvent = {
+      title: title,
+      start: startTime,
+      end: endTime,
+    };
 
-const eventsX = [
-    {
-        title: "Meeting",
-        allDay: true, 
-        start: new Date(2023, 8, 2),
-        end: new Date (2023, 8, 2)
-    },
-    {
-        title: "Vacation",
-        allDay: true, 
-        start: new Date(2023, 8, 4),
-        end: new Date (2023, 8, 3)
-    },
-    {
-        title: "Conference",
-        allDay: true, 
-        start: new Date(2023, 8, 5),
-        end: new Date (2023, 8, 5)
+    setEvents((prevEvents) => [...prevEvents, newEvent]);
+    setShowForm(false);
+    setTitle("");
+    setStartTime("");
+    setEndTime("");
+  };
+
+  function handleDateSelect(selectInfo){
+    if(
+      selectInfo.view.type === "timeGridWeek" || 
+      selectInfo.view.type === "timeGridDay"
+    ) {
+
+        selectInfo.view.calendar.unselect();
+        handleFormSubmit({
+          preventDefault: () => {},
+        });
+        setStart(selectInfo.start);
+        setEnd(selectInfo.end);
+        setModal(true);
     }
+  }
 
-]
-
-function Application(){
-    <Calendar localizer={ localizer} events={eventsX} 
-    startAccessor="start" endAccessor= "end" style={{height: 500, margin: "50px"}};
-
-    const [newEvent, setNewEvent] = useState({title: "", start: "", end: ""})
-    const [allEvents, setAllEvents] = useState(events)
-    return (
-        <div className="Application">
-            <Calendar
-                localizer={localizer}
-                events={allEvents}
-                startAccessor= "start"
-                endAccessor= "end"
-                style={{height: 500, margin: "50px"}}
-        </div>
-    )
-}
+  return (
+    <div>
+      <h1>My Calendar</h1>
+      <button onClick={handleAddEventClick}>Etkinlik Ekle</button>
+      {showForm && (
+        <form onSubmit={handleFormSubmit}>
+          <input
+            type="text"
+            placeholder="Etkinlik Başlığı"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <input
+            type="datetime-local"
+            placeholder="Başlangıç Zamanı"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+          <input
+            type="datetime-local"
+            placeholder="Bitiş Zamanı"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+          <button type="submit">Etkinliği Ekle</button>
+        </form>
+      )}
+      <FullCalendar
+        editable
+        selectable
+        dayMaxEvents
+        events={events}
+        select={handleDateSelect}
+        //dateClick={handleDa}
+        headerToolbar={{
+          start: "today prev next",
+          end: "dayGridMonth timeGridWeek timeGridDay",
+          left: "prev next today",
+          center: "title",
+        }}
+        plugins={[daygridPlugin, timeGridPlugin, interactionPlugin]}
+        views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
+      />
+    </div>
+  );
+};
