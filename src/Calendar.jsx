@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
+
 import {
   Row,
   Col,
@@ -30,6 +31,7 @@ export const MyCalendar = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState();
   const [state, setState] = useState({});
+  const [confirmEvent, setConfirmEvent] = useState(false);
   
 
   const handleAddEventClick = () => {
@@ -41,30 +43,43 @@ export const MyCalendar = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    setEvents(...[{
+    //const eventsObj = [];
+    const newEvent = {
       title: title,
       start: startTime,
       end: endTime,
-    }]);
+    };
 
-    setEvents((prevEvents) => [...prevEvents]);
+    setEvents((prevEvents)=> [...prevEvents, newEvent]);
+
     setShowForm(false);
     setTitle("");
     setStartTime("");
     setEndTime("");
   };
 
+  
   function handleDateSelect(selectInfo){
     if(
       selectInfo.view.type === "timeGridWeek" || 
       selectInfo.view.type === "timeGridDay"
     ) {
-        setEvents([selectInfo.title]);
         selectInfo.view.calendar.unselect();
+
+        const newEvent = {
+          title: title,
+          start: selectInfo.start,
+          end: selectInfo.end,
+        }
+        const eventsObj = [];
+        setEvents(eventsObjasd => [...eventsObjasd, newEvent]);
+        console.log(events);
+
         setState({ selectInfo, state: "create" });
         console.log("open modal create");
         setStart(selectInfo.start);
         setEnd(selectInfo.end);
+        setShowForm(true);
         setModal(true);
     }
   }
