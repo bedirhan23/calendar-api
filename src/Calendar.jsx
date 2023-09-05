@@ -36,16 +36,33 @@ export const MyCalendar = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   //const [click, setClickEvent] = 
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
 
+  function handleDateClick(arg) {
+    const clickedDate = arg.date;
+    const hasEvent = events.some((event) => {
+      return (
+        clickedDate >= new Date(event.start) &&
+        clickedDate <= new Date(event.end)
+      );
+    });
+  
+    if (hasEvent) {
+      // Etkinlik varsa etkinlik güncelleme ve etkinlik silme işlemleri için gerekli kodu buraya ekleyebilirsiniz.
+      // Örneğin, bir düzenleme veya silme işlemi başlatmak için bir işlev çağırabilirsiniz.
+      console.log("Tıklanan tarihde etkinlik bulunuyor.");
+    } else {
+      // Etkinlik yoksa etkinlik ekleme işlemi için gerekli kodu buraya ekleyebilirsiniz.
+      // Örneğin, etkinlik ekleme formunu açabilirsiniz.
+      setShowForm(true);
+    }
+  }
+  
   const handleAddEventClick = () => {
     setShowForm(true);
     console.log("add event click")
   };
 
-  console.log(startTime)
+  //console.log(startTime)
 
   
 
@@ -55,6 +72,7 @@ export const MyCalendar = () => {
 
     //const eventsObj = [];
     const newEvent = {
+      id: 'hamza',
       title: title,
       start: startTime,
       end: endTime,
@@ -82,7 +100,7 @@ export const MyCalendar = () => {
           start: selectInfo.start,
           end: selectInfo.end,
         }
-        const eventsObj = [];
+        //const eventsObj = [];
         //setEvents(eventsObjasd => [...eventsObjasd, newEvent]);
         console.log(events);
 
@@ -96,22 +114,78 @@ export const MyCalendar = () => {
         setShowForm(true);
         setModal(true);
         console.log("tıkladım")
+
+        /*selectInfo.view.calendar.select();*/
     }
   }
   const handleCloseForm = () => {
     setShowForm(false);
   };
 
+  function handleEventDrop(clickInfo) {
 
-  /*function handleEventClick(clickInfo) {
+    console.log("dropun içindeyim")
+    console.log(events)
+    if (clickInfo) {
+      console.log(clickInfo)
+      if (
+        window.confirm(
+          `Etkinliği silmek istediğinizden emin misiniz? '${clickInfo.event.title}'`
+        )
+      ) {
+        const updatedEvents = events.filter((event) => {
+          return event !== clickInfo.event;
+        });
+  
+        setEvents(updatedEvents);
+        setModal(false);
+      }
+    }
+  }
+  
 
-    setState({ clickInfo, state: "update" });
-    setTitle(clickInfo.event.title);
-    setStart(clickInfo.event.start);
-    setEnd(clickInfo.event.end);
+  function handleEventClick(clickInfo) {
 
-    setModal(true);
+      // console.log("open modal update, delete");
+      setState({ clickInfo, state: "update" });
+      // set detail
+      setTitle(clickInfo.event.title);
+      setStart(clickInfo.event.start);
+      setEnd(clickInfo.event.end);
+      console.log("handleEventClickk")
+      setShowForm(true);
+      setModal(true);
+  }
+
+  /*function handleEdit() {
+    // console.log(start, end);
+    // state.clickInfo.event.setAllDay(true);
+
+    state.clickInfo.event.setStart(start);
+    state.clickInfo.event.setEnd(end);
+    state.clickInfo.event.mutate({
+      standardProps: { title }
+    });
+    handleClose();
+  }*
+  
+  /*function handleDelete() {
+    // console.log(JSON.stringify(state.clickInfo.event));
+    // console.log(state.clickInfo.event.id);
+    state.clickInfo.event.remove();
+    handleClose();
   }*/
+
+  /*function handleClose() {
+    setTitle("");
+    setStart(new Date());
+    setEnd(new Date());
+    setState({});
+    setModal(false);
+  }*/
+
+
+
  return (
     <div>
       <h1>My Calendar</h1>
@@ -137,6 +211,7 @@ export const MyCalendar = () => {
             onChange={(e) => setEndTime(e.target.value)}
           />
           <button type="submit">Etkinliği Ekle</button>
+          <button type="button" onClick={handleEventDrop}> Etkinliği Sil</button>
         </form>
       )}
       <FullCalendar
@@ -145,7 +220,9 @@ export const MyCalendar = () => {
         dayMaxEvents
         events={events}
         select={handleDateSelect}
-        //dateClick={handleDa}
+        eventDrop={handleEventDrop}
+        eventClick={handleEventClick}
+        dateClick={handleDateClick}
         headerToolbar={{
           start: "today prev next",
           end: "dayGridMonth timeGridWeek timeGridDay",
