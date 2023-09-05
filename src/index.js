@@ -9,6 +9,8 @@ import reportWebVitals from './reportWebVitals';
 import  {Login}  from './Login';
 import  {MyCalendar}  from './Calendar';
 import  {Register}  from './Registerv2';
+//import MyCalendar from "./Calendar"; // Doğru içe aktarım
+
 
 const root = ReactDOM.createRoot(document.getElementById('root')); //ReactDOM.render yaparak düzelt
 root.render(

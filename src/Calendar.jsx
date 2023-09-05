@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import Modal from "react-modal";
 
 import {
   Row,
@@ -28,17 +29,26 @@ export const MyCalendar = () => {
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
-  const [startTime, setStartTime] = useState("");
+  const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState();
   const [state, setState] = useState({});
   const [confirmEvent, setConfirmEvent] = useState(false);
-  
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  //const [click, setClickEvent] = 
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
 
   const handleAddEventClick = () => {
     setShowForm(true);
+    console.log("add event click")
   };
 
+  console.log(startTime)
+
   
+
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -56,6 +66,7 @@ export const MyCalendar = () => {
     setTitle("");
     setStartTime("");
     setEndTime("");
+    console.log("submit ettim")
   };
 
   
@@ -72,17 +83,24 @@ export const MyCalendar = () => {
           end: selectInfo.end,
         }
         const eventsObj = [];
-        setEvents(eventsObjasd => [...eventsObjasd, newEvent]);
+        //setEvents(eventsObjasd => [...eventsObjasd, newEvent]);
         console.log(events);
 
         setState({ selectInfo, state: "create" });
         console.log("open modal create");
         setStart(selectInfo.start);
         setEnd(selectInfo.end);
+        console.log(selectInfo);
+        setStartTime(new Date(selectInfo.start).toISOString().slice(0,-1))
+        setEndTime(new Date(selectInfo.end).toISOString().slice(0,-1))
         setShowForm(true);
         setModal(true);
+        console.log("tıkladım")
     }
   }
+  const handleCloseForm = () => {
+    setShowForm(false);
+  };
 
 
   /*function handleEventClick(clickInfo) {
@@ -94,11 +112,10 @@ export const MyCalendar = () => {
 
     setModal(true);
   }*/
-
-  return (
+ return (
     <div>
       <h1>My Calendar</h1>
-      <button onClick={handleAddEventClick}>Etkinlik Ekle</button>
+      {/*<button onClick={handleAddEventClick}>Etkinlik Ekle</button>*/}
       {showForm && (
         <form onSubmit={handleFormSubmit}>
           <input
@@ -135,6 +152,8 @@ export const MyCalendar = () => {
           left: "prev next today",
           center: "title",
         }}
+        timeZone="UTC"
+        locale="tr"
         plugins={[daygridPlugin, timeGridPlugin, interactionPlugin]}
         views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
       />
