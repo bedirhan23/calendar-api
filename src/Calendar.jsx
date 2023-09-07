@@ -3,7 +3,10 @@ import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from '@fullcalendar/list';
 import Modal from "react-modal";
+import axios from 'axios';
+import './index.css';
 
 import {
   Row,
@@ -16,6 +19,7 @@ import {
 } from "reactstrap";
 import Select from "react-select";
 import DateRangePicker from "react-bootstrap-daterangepicker";
+import { data } from "jquery";
 
 export const MyCalendar = () => {
 
@@ -31,6 +35,7 @@ export const MyCalendar = () => {
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState();
+  const [etkinlikId, setEtkinlikId] = useState();
   const [state, setState] = useState({});
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -53,12 +58,12 @@ export const MyCalendar = () => {
     } else {
       // Etkinlik yoksa etkinlik ekleme işlemi için gerekli kodu buraya ekleyebilirsiniz.
       // Örneğin, etkinlik ekleme formunu açabilirsiniz.
-      setShowForm(true);
+      //setShowForm(true);
     }
   }
   
   const handleAddEventClick = () => {
-    setShowForm(true);
+    //setShowForm(true);
     console.log("add event click")
   };
 
@@ -69,24 +74,36 @@ export const MyCalendar = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
-    //const eventsObj = [];
-    const newEvent = {
-      id: 'hamza',
-      title: title,
-      start: startTime,
-      end: endTime,
-    };
-
-    setEvents((prevEvents)=> [...prevEvents, newEvent]);
-
-    setShowForm(false);
-    setTitle("");
-    setStartTime("");
-    setEndTime("");
-    console.log("submit ettim")
+  
+    // Aynı etkinlik daha önce eklenmiş mi kontrol et
+    const isEventExist = events.some((event) => {
+      return (
+        event.title === title &&
+        new Date(event.start).toISOString() === new Date(startTime).toISOString() &&
+        new Date(event.end).toISOString() === new Date(endTime).toISOString()
+      );
+    });
+  
+    if (isEventExist) {
+      alert("Bu etkinlik zaten eklenmiş.");
+    } else {
+      // Aynı etkinlik eklenmemişse yeni etkinliği ekleyin
+      const newEvent = {
+        title: title,
+        start: startTime,
+        end: endTime,
+      };
+  
+      setEvents((prevEvents) => [...prevEvents, newEvent]);
+  
+      setShowForm(false);
+      setTitle("");
+      setStartTime("");
+      setEndTime("");
+      console.log("submit ettim");
+    }
   };
-
+  
   
   function handleDateSelect(selectInfo){
     if(
@@ -112,14 +129,14 @@ export const MyCalendar = () => {
         setStartTime(new Date(selectInfo.start).toISOString().slice(0,-1))
         setEndTime(new Date(selectInfo.end).toISOString().slice(0,-1))
         setShowForm(true);
-        setModal(true);
+        //setModal(true);
         console.log("tıkladım")
 
         /*selectInfo.view.calendar.select();*/
     }
   }
   const handleCloseForm = () => {
-    setShowForm(false);
+    //setShowForm(false);
   };
 
   function handleEventDrop(clickInfo) {
@@ -184,12 +201,68 @@ export const MyCalendar = () => {
     setModal(false);
   }*/
 
+  const postData = (e) => {
+    const dataToSend = {
+      title: title,
+      startTime: startTime,
+      endTime: endTime
+    }
+    console.log(dataToSend)
+    fetch('http://localhost:3000/api/Calendar', {
+      method: 'POST',
+      body: JSON.stringify(dataToSend)
+    })
+  }
 
+  const deleteEvent = () => {
+    const dataToDelete = {
+      eventId : etkinlikId
+    };
+    console.log(dataToDelete);
+    fetch('http://localhost:3000/api/Calendar/' + etkinlikId, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataToDelete)
+
+    })
+  }
+
+  /*const calendarOptions = {
+    views: {
+      listDay: {buttonText: 'list day'},
+      listWeek: { buttonText: 'list week'},
+      listMonth: {buttonText: 'list month'},
+    },
+    header: {
+      left: 'title',
+      center: '',
+      right: 'listDay, listWeek, listMonth'
+    },
+
+    events: events
+
+  }*/
+
+  const getAllEvents = () => {
+    const dataGetAll = {
+      title: title,
+      startTime: startTime,
+      endTime: endTime,      
+    }
+    console.log(dataGetAll);
+    fetch('http://localhost:3000/api/Calendar', {
+      method: 'GET',
+      body: JSON.stringify(dataGetAll)
+    })
+  }
+
+  //console.log(events)
 
  return (
-    <div>
+    <div className="calendarForm">
       <h1>My Calendar</h1>
-      {/*<button onClick={handleAddEventClick}>Etkinlik Ekle</button>*/}
       {showForm && (
         <form onSubmit={handleFormSubmit}>
           <input
@@ -210,8 +283,9 @@ export const MyCalendar = () => {
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
           />
-          <button type="submit">Etkinliği Ekle</button>
-          <button type="button" onClick={handleEventDrop}> Etkinliği Sil</button>
+          <button type="submit" onClick={postData}>Etkinliği Ekle</button>
+          <button type="button" onClick={() => {handleEventDrop(); deleteEvent()}}> Etkinliği Sil</button>
+          <button type="button" onClick={getAllEvents}>All Events</button>
         </form>
       )}
       <FullCalendar
@@ -223,16 +297,29 @@ export const MyCalendar = () => {
         eventDrop={handleEventDrop}
         eventClick={handleEventClick}
         dateClick={handleDateClick}
+        //slotWidth={0.5}
+        //height={'80%'}
+        //windowResize={'50%'}
+        //contentHeight={1000}
+        //contentWidth = {50}
+        //aspectRatio={1.65}
         headerToolbar={{
-          start: "today prev next",
+          start: "today prev next listDay listWeek listMonth",
           end: "dayGridMonth timeGridWeek timeGridDay",
-          left: "prev next today",
+          //left: "prev next today",
           center: "title",
         }}
         timeZone="UTC"
         locale="tr"
-        plugins={[daygridPlugin, timeGridPlugin, interactionPlugin]}
-        views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
+        plugins={[daygridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+        //views={["dayGridMonth", "dayGridWeek", "dayGridDay", 'listWeek']}
+        //views = {listDay = {buttonText: 'List Day'}, listWeek = {buttonText: 'List Day'}, listMonth = {buttonText: 'List Month'}}
+        views={{
+          listDay: { buttonText: 'Day List' }, // List Day görünümü için düğme metni
+          listWeek: { buttonText: 'Week List' }, // List Week görünümü için düğme metni
+          listMonth: { buttonText: 'Month List' }, // List Month görünümü için düğme metni
+        }}
+        
       />
     </div>
   );
