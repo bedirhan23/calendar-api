@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -19,7 +19,7 @@ import {
 } from "reactstrap";
 import Select from "react-select";
 import DateRangePicker from "react-bootstrap-daterangepicker";
-import { data } from "jquery";
+import { data, error } from "jquery";
 
 export const MyCalendar = () => {
 
@@ -69,7 +69,19 @@ export const MyCalendar = () => {
 
   //console.log(startTime)
 
-  
+  useEffect(() => {
+    console.log('Events: ', events)
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem("event", JSON.stringify(events));
+  }, [events]);
+
+  useEffect(() => {
+    const data = localStorage.getItem('MY_APP_STATE')
+    if ( data !== null) setEvents(JSON.parse(data));
+    getAllEvents();
+  }, []);
 
 
   const handleFormSubmit = (e) => {
@@ -135,9 +147,10 @@ export const MyCalendar = () => {
         /*selectInfo.view.calendar.select();*/
     }
   }
-  const handleCloseForm = () => {
-    //setShowForm(false);
-  };
+
+  function handleEvents(events) {
+    setCurrentEvents(events);
+  }
 
   function handleEventDrop(clickInfo) {
 
@@ -208,8 +221,11 @@ export const MyCalendar = () => {
       endTime: endTime
     }
     console.log(dataToSend)
-    fetch('http://localhost:3000/api/Calendar', {
+    fetch('http://localhost:57200/api/Calendar', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(dataToSend)
     })
   }
@@ -219,7 +235,7 @@ export const MyCalendar = () => {
       eventId : etkinlikId
     };
     console.log(dataToDelete);
-    fetch('http://localhost:3000/api/Calendar/' + etkinlikId, {
+    fetch('http://localhost:57200/api/Calendar/' + etkinlikId, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -229,35 +245,55 @@ export const MyCalendar = () => {
     })
   }
 
-  /*const calendarOptions = {
-    views: {
-      listDay: {buttonText: 'list day'},
-      listWeek: { buttonText: 'list week'},
-      listMonth: {buttonText: 'list month'},
-    },
-    header: {
-      left: 'title',
-      center: '',
-      right: 'listDay, listWeek, listMonth'
-    },
-
-    events: events
-
-  }*/
-
-  const getAllEvents = () => {
-    const dataGetAll = {
-      title: title,
+  const updateEvent = (e) => {
+    const dataToUpdate = {
+      title: title, 
       startTime: startTime,
-      endTime: endTime,      
+      endTime: endTime
     }
-    console.log(dataGetAll);
-    fetch('http://localhost:3000/api/Calendar', {
-      method: 'GET',
-      body: JSON.stringify(dataGetAll)
+    console.log(dataToUpdate)
+    fetch('http://localhost:57200/api/Calendar', {
+      method: 'PUT',
+      body: JSON
     })
   }
 
+
+  const getAllEvents = () => {
+    fetch('http://localhost:57200/api/Calendar', {
+      method: 'GET',
+      //body: JSON.stringify(dataGetAll),
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    })
+    .then( response => response.json())
+    .then(data => {
+      setEvents(data);
+      console.log("data", data);
+    })
+    .catch( error => {
+      console.error('Etkinlikleri getirirken hata oluştu: ', error);
+    });
+  }
+
+  /*const getEvent =() => {
+    fetch('http://localhost:57200/api/Calendar', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    })
+    .then( response => response.json())
+    .then(data => {
+      setEvents(data);
+    })
+    .catch( error => {
+      console.error('')
+    })
+  }*/
   //console.log(events)
 
  return (

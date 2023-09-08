@@ -1,4 +1,4 @@
-const events = [
+/*const events = [
     { title: "All Day Event", start: getDate("YEAR-MONTH-01") },
     {
       title: "Long Event",
@@ -44,5 +44,44 @@ const events = [
     return dayString.replace("YEAR", year).replace("MONTH", month);
   }
   
-  export default events;
+  export default events;*/
+
+import React, { useEffect, useState } from "react";
+
+function getDataFromMssql() {
+  const [dictionaryData, setDictionaryData] = useState({});
+
+  useEffect(() => {
+    // Fetch data from your SQL Server database using the fetch API
+    fetch("YOUR_API_ENDPOINT_HERE")
+      .then((response) => response.json())
+      .then((data) => {
+        // Assuming the response contains an array of dictionary items
+        const dictionary = {};
+
+        data.forEach((item) => {
+          // Assuming each item has 'key' and 'value' properties
+          dictionary[item.key] = item.value;
+        });
+
+        setDictionaryData(dictionary);
+      });
+  }, []);
+
+  return (
+    <div>
+      <h1>Dictionary</h1>
+      <ul>
+        {Object.entries(dictionaryData).map(([key, value]) => (
+          <li key={key}>
+            <strong>{key}:</strong> {value}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default getDataFromMssql;
+
   
