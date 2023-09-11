@@ -19,7 +19,7 @@ import {
 } from "reactstrap";
 import Select from "react-select";
 import DateRangePicker from "react-bootstrap-daterangepicker";
-import { data, error } from "jquery";
+import { data, error, event } from "jquery";
 
 export const MyCalendar = () => {
 
@@ -30,7 +30,7 @@ export const MyCalendar = () => {
   const calendarRef = useRef(null);
   const [start, setStart] = useState(new Date());
   const [end, setEnd] = useState(new Date());
-  const [events, setEvents] = useState([]);
+  let [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(new Date());
@@ -179,10 +179,20 @@ export const MyCalendar = () => {
       // console.log("open modal update, delete");
       setState({ clickInfo, state: "update" });
       // set detail
+      const eventId = clickInfo.event.id;
       setTitle(clickInfo.event.title);
       setStart(clickInfo.event.start);
       setEnd(clickInfo.event.end);
-      console.log("handleEventClickk")
+      deleteEventById(eventId);
+      console.log(event.id);
+      /*events = events.filter(event => {
+        console.log(event.id);
+        console.log("event deleted");
+        console.log("handleEventClickk");
+        return event.id !== 3;
+        console.log(clickInfo.event.id);
+
+      });*/
       setShowForm(true);
       setModal(true);
   }
@@ -230,20 +240,27 @@ export const MyCalendar = () => {
     })
   }
 
-  const deleteEvent = () => {
-    const dataToDelete = {
-      eventId : etkinlikId
-    };
-    console.log(dataToDelete);
-    fetch('http://localhost:57200/api/Calendar/' + etkinlikId, {
+  const deleteEventById = (eventId) => {
+    fetch(`http://localhost:57200/api/Calendar/${eventId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(dataToDelete)
-
     })
-  }
+      .then((response) => {
+        if (response.ok) {
+          // If the delete request was successful, remove the event from the events state
+          setEvents((prevEvents) => prevEvents.filter((event) => event.eventId !== eventId));
+          console.log(`Event with ID ${eventId} deleted successfully.`);
+        } else {
+          console.error(`Failed to delete event with ID ${eventId}.`);
+        }
+      })
+      .catch((error) => {
+        console.error(`Error deleting event with ID ${eventId}: `, error);
+      });
+  };
+  
 
   const updateEvent = (e) => {
     const dataToUpdate = {
@@ -278,7 +295,7 @@ export const MyCalendar = () => {
     });
   }
 
-  /*const getEvent =() => {
+  const getEvent =() => {
     fetch('http://localhost:57200/api/Calendar', {
       method: 'GET',
       headers: {
@@ -293,7 +310,7 @@ export const MyCalendar = () => {
     .catch( error => {
       console.error('')
     })
-  }*/
+  }
   //console.log(events)
 
  return (
@@ -320,7 +337,7 @@ export const MyCalendar = () => {
             onChange={(e) => setEndTime(e.target.value)}
           />
           <button type="submit" onClick={postData}>Etkinliği Ekle</button>
-          <button type="button" onClick={() => {handleEventDrop(); deleteEvent()}}> Etkinliği Sil</button>
+          <button type="button" onClick={() => {deleteEventById()}}> Etkinliği Sil</button>
           <button type="button" onClick={getAllEvents}>All Events</button>
         </form>
       )}
