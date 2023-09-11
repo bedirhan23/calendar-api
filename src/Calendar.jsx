@@ -7,6 +7,7 @@ import listPlugin from '@fullcalendar/list';
 import Modal from "react-modal";
 import axios from 'axios';
 import './index.css';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Row,
@@ -30,7 +31,7 @@ export const MyCalendar = () => {
   const calendarRef = useRef(null);
   const [start, setStart] = useState(new Date());
   const [end, setEnd] = useState(new Date());
-  let [events, setEvents] = useState([]);
+  //let [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(new Date());
@@ -40,7 +41,10 @@ export const MyCalendar = () => {
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   //const [click, setClickEvent] = 
-
+  const [events, setEvents] = useState(() => {
+    const storedEvents = JSON.parse(localStorage.getItem("event")) || [];
+    return storedEvents;
+  });
 
   function handleDateClick(arg) {
     const clickedDate = arg.date;
@@ -69,17 +73,19 @@ export const MyCalendar = () => {
 
   //console.log(startTime)
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log('Events: ', events)
-  }, [events]);
+  }, [events]);*/
 
   useEffect(() => {
     localStorage.setItem("event", JSON.stringify(events));
   }, [events]);
 
   useEffect(() => {
-    const data = localStorage.getItem('MY_APP_STATE')
-    if ( data !== null) setEvents(JSON.parse(data));
+    // localStorage'dan veriyi çek
+    const storedEvents = JSON.parse(localStorage.getItem("event")) || [];
+    setEvents(storedEvents);
+
     getAllEvents();
   }, []);
 
@@ -101,6 +107,7 @@ export const MyCalendar = () => {
     } else {
       // Aynı etkinlik eklenmemişse yeni etkinliği ekleyin
       const newEvent = {
+        id: uuidv4(),
         title: title,
         start: startTime,
         end: endTime,
@@ -125,6 +132,7 @@ export const MyCalendar = () => {
         selectInfo.view.calendar.unselect();
 
         const newEvent = {
+          id: uuidv4(),
           title: title,
           start: selectInfo.start,
           end: selectInfo.end,
@@ -176,26 +184,38 @@ export const MyCalendar = () => {
 
   function handleEventClick(clickInfo) {
 
+      const eventId = clickInfo.event.id;
       // console.log("open modal update, delete");
       setState({ clickInfo, state: "update" });
       // set detail
-      const eventId = clickInfo.event.id;
       setTitle(clickInfo.event.title);
       setStart(clickInfo.event.start);
       setEnd(clickInfo.event.end);
-      deleteEventById(eventId);
-      console.log(event.id);
-      /*events = events.filter(event => {
-        console.log(event.id);
-        console.log("event deleted");
-        console.log("handleEventClickk");
-        return event.id !== 3;
-        console.log(clickInfo.event.id);
-
-      });*/
+      console.log(eventId);
+      //deleteEventById(eventId);
       setShowForm(true);
       setModal(true);
   }
+
+  // function handleDeleteEventClick(event) {
+  //   if (window.confirm(`Etkinliği silmek istediğinizden emin misiniz?`)) {
+  //     deleteEventById(event.eventId);
+  //   }
+  // }
+//   function handleEventClick(clickInfo) {
+
+//     const eventId = clickInfo.event.id;
+//     // console.log("open modal update, delete");
+//     setState({ clickInfo, state: "update" });
+//     // set detail
+//     setTitle(clickInfo.event.title);
+//     setStart(clickInfo.event.start);
+//     setEnd(clickInfo.event.end);
+//     deleteEventById(eventId);
+//     console.log(eventId);
+//     setShowForm(true);
+//     setModal(true);
+// }
 
   /*function handleEdit() {
     // console.log(start, end);
@@ -227,10 +247,10 @@ export const MyCalendar = () => {
   const postData = (e) => {
     const dataToSend = {
       title: title,
-      startTime: startTime,
-      endTime: endTime
+      start: new Date(startTime).toISOString().slice(0,-1),
+      end: new Date(endTime).toISOString().slice(0,-1),
     }
-    console.log(dataToSend)
+    console.log("zorludeneme",dataToSend )
     fetch('http://localhost:57200/api/Calendar', {
       method: 'POST',
       headers: {
@@ -240,17 +260,23 @@ export const MyCalendar = () => {
     })
   }
 
-  const deleteEventById = (eventId) => {
+  const deleteEventById = (event) => {
+    const eventId = event.id;
+    console.log("deleteEvent",eventId);
+    console.log("Zorlu");
     fetch(`http://localhost:57200/api/Calendar/${eventId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
       },
     })
+
       .then((response) => {
+        console.log("response icindeyim")
         if (response.ok) {
           // If the delete request was successful, remove the event from the events state
-          setEvents((prevEvents) => prevEvents.filter((event) => event.eventId !== eventId));
+          setEvents((prevEvents) => prevEvents.filter((e) => e.id !== eventId));
           console.log(`Event with ID ${eventId} deleted successfully.`);
         } else {
           console.error(`Failed to delete event with ID ${eventId}.`);
@@ -262,18 +288,41 @@ export const MyCalendar = () => {
   };
   
 
-  const updateEvent = (e) => {
-    const dataToUpdate = {
-      title: title, 
-      startTime: startTime,
-      endTime: endTime
-    }
-    console.log(dataToUpdate)
-    fetch('http://localhost:57200/api/Calendar', {
+  const updateEvent = () => {
+    const updatedEvent = {
+      id: state.clickInfo.event.id, // Event ID'si değişmeden kalır
+      title: title,
+      start: startTime,
+      end: endTime,
+    };
+  
+    fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
       method: 'PUT',
-      body: JSON
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify(updatedEvent),
     })
-  }
+      .then((response) => {
+        if (response.ok) {
+          // Event başarıyla güncellendiğinde yerel state'i güncelle
+          setEvents((prevEvents) =>
+            prevEvents.map((event) =>
+              event.id === updatedEvent.id ? updatedEvent : event
+            )
+          );
+          console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
+        } else {
+          console.error(`Failed to update event with ID ${updatedEvent.id}.`);
+        }
+        setModalIsOpen(false); // Modal'ı kapat
+      })
+      .catch((error) => {
+        console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
+      });
+  };
+  
 
 
   const getAllEvents = () => {
@@ -337,8 +386,9 @@ export const MyCalendar = () => {
             onChange={(e) => setEndTime(e.target.value)}
           />
           <button type="submit" onClick={postData}>Etkinliği Ekle</button>
-          <button type="button" onClick={() => {deleteEventById()}}> Etkinliği Sil</button>
+          <button type="button" onClick={() => {deleteEventById(state.clickInfo.event)}}> Etkinliği Sil</button>
           <button type="button" onClick={getAllEvents}>All Events</button>
+          <button type= "button" onClick={updateEvent}>Etkinliği Güncelle</button>
         </form>
       )}
       <FullCalendar
