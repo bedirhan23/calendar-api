@@ -38,7 +38,7 @@ export const MyCalendar = () => {
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState();
   const [etkinlikId, setEtkinlikId] = useState();
-  const [state, setState] = useState({});
+  const [state, setState] = useState({clickInfo: {event: null}});
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const toggleModal = () => {
@@ -91,9 +91,11 @@ export const MyCalendar = () => {
   }, []);
 
 
-  // useEffect (() => {
-  //   setModal(new bootstrap)
-  // })
+  // useEffect(() => {
+  //   if(state.clickInfo.event){
+  //     handleEventResize(state.clickInfo.event);
+  //   }
+  // }, [state.clickInfo.event]);
   
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -198,46 +200,68 @@ export const MyCalendar = () => {
     setEtkinlikId(eventId);
   };
   
+  // const handleEventResize = (eventInfo) => {
+  //   console.log("Click Info Event:", state.clickInfo.event);
 
-  function handleEventResize(clickInfo) {
-    // console.log(checkInfo);
-    const updatedEvent = {
-      id : state.clickInfo.event.id,
-      title: clickInfo.event.title,
-      start: clickInfo.event.start,
-      end: clickInfo.event.end,
-    }
-    alert(clickInfo.event.title + " end is now " + clickInfo.event.end.toISOString());
-    fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify(updatedEvent),
-    })
-      .then((response) => {
-        if (response.ok) {
-          // Event başarıyla güncellendiğinde yerel state'i güncelle
-          setEvents((prevEvents) =>
-            prevEvents.map((event) =>
-              event.id === updatedEvent.id ? updatedEvent : event
-            )
-          );
-          console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
-        } else {
-          console.error(`Failed to update event with ID ${updatedEvent.id}.`);
-        }
-        setModalIsOpen(false); // Modal'ı kapat
-      })
-      .catch((error) => {
-        console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
-      });
-      updateEvent(updatedEvent);
+  //   if (!eventInfo) {
+  //     console.error("Event info is undefined.");
+  //     return;
+  //   }
 
-      setConfirmModal(true);
+  //   const eventId = eventInfo.id;
 
-  }
+  //   const updatedEvent = {
+  //     id : eventId,
+  //     start : eventInfo.start,
+  //     end: eventInfo.end
+  //   };
+
+  //   updateEvent(updatedEvent);
+  // };
+
+
+  // function handleEventResize(event) {
+
+  //   const eventId = event.id;
+  //   console.log("RESIZZE", clickInfo);
+  //   // console.log(checkInfo);
+  //   const updatedEvent = {
+  //     id : state.clickInfo.event.id,
+  //     title: clickInfo.event.title,
+  //     start: clickInfo.event.start,
+  //     end: clickInfo.event.end,
+  //   }
+  //   alert(clickInfo.event.title + " end is now " + clickInfo.event.end.toISOString());
+  //   fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
+  //     method: 'PUT',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Access-Control-Allow-Origin': '*',
+  //     },
+  //     body: JSON.stringify(updatedEvent),
+  //   })
+  //     .then((response) => {
+  //       if (response.ok) {
+  //         // Event başarıyla güncellendiğinde yerel state'i güncelle
+  //         setEvents((prevEvents) =>
+  //           prevEvents.map((event) =>
+  //             event.id === updatedEvent.id ? updatedEvent : event
+  //           )
+  //         );
+  //         console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
+  //       } else {
+  //         console.error(`Failed to update event with ID ${updatedEvent.id}.`);
+  //       }
+  //       setModalIsOpen(false); // Modal'ı kapat
+  //     })
+  //     .catch((error) => {
+  //       console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
+  //     });
+  //     updateEvent(updatedEvent);
+
+  //     setConfirmModal(true);
+
+  // }
   // function handleDeleteEventClick(event) {
   //   if (window.confirm(`Etkinliği silmek istediğinizden emin misiniz?`)) {
   //     deleteEventById(event.eventId);
