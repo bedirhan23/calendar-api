@@ -8,6 +8,9 @@ import Modal from "react-modal";
 import axios from 'axios';
 import './index.css';
 import { v4 as uuidv4 } from 'uuid';
+import CustomModal from "./components/CustomModal";
+import DateRangePicker from "react-bootstrap-daterangepicker";
+
 
 import {
   Row,
@@ -19,7 +22,6 @@ import {
   Container
 } from "reactstrap";
 import Select from "react-select";
-import DateRangePicker from "react-bootstrap-daterangepicker";
 import { data, error, event } from "jquery";
 
 export const MyCalendar = () => {
@@ -31,7 +33,6 @@ export const MyCalendar = () => {
   const calendarRef = useRef(null);
   const [start, setStart] = useState(new Date());
   const [end, setEnd] = useState(new Date());
-  //let [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(new Date());
@@ -40,7 +41,17 @@ export const MyCalendar = () => {
   const [state, setState] = useState({});
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  //const [click, setClickEvent] = 
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+  const handleAddEventClick = () => {
+    toggleModal();
+  };
+  const handleCloseModal = () => {
+    handleClose();
+    setModal(false);
+  };
+  
   const [events, setEvents] = useState(() => {
     const storedEvents = JSON.parse(localStorage.getItem("event")) || [];
     return storedEvents;
@@ -66,16 +77,6 @@ export const MyCalendar = () => {
     }
   }
   
-  const handleAddEventClick = () => {
-    //setShowForm(true);
-    console.log("add event click")
-  };
-
-  //console.log(startTime)
-
-  /*useEffect(() => {
-    console.log('Events: ', events)
-  }, [events]);*/
 
   useEffect(() => {
     localStorage.setItem("event", JSON.stringify(events));
@@ -90,6 +91,10 @@ export const MyCalendar = () => {
   }, []);
 
 
+  // useEffect (() => {
+  //   setModal(new bootstrap)
+  // })
+  
   const handleFormSubmit = (e) => {
     e.preventDefault();
   
@@ -149,6 +154,7 @@ export const MyCalendar = () => {
         setStartTime(new Date(selectInfo.start).toISOString().slice(0,-1))
         setEndTime(new Date(selectInfo.end).toISOString().slice(0,-1))
         setShowForm(true);
+        console.log("showForm set to true");
         //setModal(true);
         console.log("tıkladım")
 
@@ -182,21 +188,56 @@ export const MyCalendar = () => {
   }
   
 
-  function handleEventClick(clickInfo) {
+  const handleEventClick = (clickInfo) => {
+    const eventId = clickInfo.event.id;
+    setState({ clickInfo, state: "update" });
+    setTitle(clickInfo.event.title);
+    setStart(clickInfo.event.start);
+    setEnd(clickInfo.event.end);
+    toggleModal();
+    setEtkinlikId(eventId);
+  };
+  
 
-      const eventId = clickInfo.event.id;
-      // console.log("open modal update, delete");
-      setState({ clickInfo, state: "update" });
-      // set detail
-      setTitle(clickInfo.event.title);
-      setStart(clickInfo.event.start);
-      setEnd(clickInfo.event.end);
-      console.log(eventId);
-      //deleteEventById(eventId);
-      setShowForm(true);
-      setModal(true);
+  function handleEventResize(clickInfo) {
+    // console.log(checkInfo);
+    const updatedEvent = {
+      id : state.clickInfo.event.id,
+      title: clickInfo.event.title,
+      start: clickInfo.event.start,
+      end: clickInfo.event.end,
+    }
+    alert(clickInfo.event.title + " end is now " + clickInfo.event.end.toISOString());
+    fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Event başarıyla güncellendiğinde yerel state'i güncelle
+          setEvents((prevEvents) =>
+            prevEvents.map((event) =>
+              event.id === updatedEvent.id ? updatedEvent : event
+            )
+          );
+          console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
+        } else {
+          console.error(`Failed to update event with ID ${updatedEvent.id}.`);
+        }
+        setModalIsOpen(false); // Modal'ı kapat
+      })
+      .catch((error) => {
+        console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
+      });
+      updateEvent(updatedEvent);
+
+      setConfirmModal(true);
+
   }
-
   // function handleDeleteEventClick(event) {
   //   if (window.confirm(`Etkinliği silmek istediğinizden emin misiniz?`)) {
   //     deleteEventById(event.eventId);
@@ -362,6 +403,18 @@ export const MyCalendar = () => {
   }
   //console.log(events)
 
+  // UTC tarihini yerel saat dilimine dönüştürme
+
+  function handleClose() {
+    setTitle("");
+    setStart(new Date());
+    setEnd(new Date());
+    setState({});
+    setModal(false);
+  }
+
+
+
  return (
     <div className="calendarForm">
       <h1>My Calendar</h1>
@@ -400,6 +453,7 @@ export const MyCalendar = () => {
         eventDrop={handleEventDrop}
         eventClick={handleEventClick}
         dateClick={handleDateClick}
+        //eventResize={handleEventResize}
         //slotWidth={0.5}
         //height={'80%'}
         //windowResize={'50%'}
@@ -415,8 +469,6 @@ export const MyCalendar = () => {
         timeZone="UTC"
         locale="tr"
         plugins={[daygridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-        //views={["dayGridMonth", "dayGridWeek", "dayGridDay", 'listWeek']}
-        //views = {listDay = {buttonText: 'List Day'}, listWeek = {buttonText: 'List Day'}, listMonth = {buttonText: 'List Month'}}
         views={{
           listDay: { buttonText: 'Day List' }, // List Day görünümü için düğme metni
           listWeek: { buttonText: 'Week List' }, // List Week görünümü için düğme metni
@@ -424,6 +476,51 @@ export const MyCalendar = () => {
         }}
         
       />
+      <CustomModal
+        title={state.state === "update" ? "Update Event" : "Add Event"}
+        isOpen={modal}
+        toggle={handleCloseModal}
+        onCancel={handleCloseModal}
+        onSubmit={state.clickInfo ? updateEvent : handleFormSubmit}
+        submitText={state.clickInfo ? "Update" : "Save"}
+        onDelete={() => {
+          
+          if (state.clickInfo){
+            deleteEventById(state.clickInfo.event);
+            handleCloseModal();
+          }
+        }}
+        deleteText="Delete"
+      >
+        <FormGroup>
+          <Label for="exampleEmail">Title</Label>
+          <Input
+            type="text"
+            title="title"
+            placeholder="with a placeholder"
+            value={title}
+            onChange={(e) => {setTitle(e.target.value)}}
+            
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="exampleEmail">From - End</Label>
+          <input
+            type="datetime-local"
+            placeholder="Başlangıç Zamanı"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+          <input
+            type="datetime-local"
+            placeholder="Bitiş Zamanı"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </FormGroup>
+
+      </CustomModal>
+
     </div>
   );
 };
