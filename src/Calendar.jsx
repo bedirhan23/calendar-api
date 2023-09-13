@@ -303,7 +303,19 @@ export const MyCalendar = () => {
       },
       body: JSON.stringify(dataToSend)
     })
-  }
+
+    .then((response) => {
+      console.log("response icindeyim")
+      if (response.ok){
+        console.log("Etkinlik başarıyla oluşturuldu.");
+      } else {
+        console.error("Etkinlik oluşturulurken hata oldu.");
+      }
+    })
+    .catch((error) => {
+      console.error('Error adding new event');
+    });
+  };
 
   const deleteEventById = (event) => {
     const eventId = event.id;
@@ -323,6 +335,7 @@ export const MyCalendar = () => {
           // If the delete request was successful, remove the event from the events state
           setEvents((prevEvents) => prevEvents.filter((e) => e.id !== eventId));
           console.log(`Event with ID ${eventId} deleted successfully.`);
+          getAllEvents();
         } else {
           console.error(`Failed to delete event with ID ${eventId}.`);
         }
@@ -337,8 +350,8 @@ export const MyCalendar = () => {
     const updatedEvent = {
       id: state.clickInfo.event.id, // Event ID'si değişmeden kalır
       title: title,
-      start: new Date(startTime).toISOString(),
-      end: new Date(endTime).toISOString(),
+      start: new Date(startTime + 'Z').toISOString(),
+      end: new Date(endTime + 'Z').toISOString(),
     };
   
     fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
@@ -355,8 +368,11 @@ export const MyCalendar = () => {
           setEvents((prevEvents) =>
             prevEvents.map((event) =>
               event.id === updatedEvent.id ? updatedEvent : event
+              
             )
+            
           );
+          getAllEvents();
           console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
         } else {
           console.error(`Failed to update event with ID ${updatedEvent.id}.`);
@@ -381,13 +397,21 @@ export const MyCalendar = () => {
     })
     .then( response => response.json())
     .then(data => {
-      setEvents(data);
-      console.log("data", data);
+      const correctedEvents = data.map((event) => {
+        return {
+          ...event,
+          start: new Date(event.start + 'Z'),
+          end: new Date(event.end + 'Z'),
+        };
+      });
+      setEvents(correctedEvents);
+      console.log("data", correctedEvents);
     })
     .catch( error => {
       console.error('Etkinlikleri getirirken hata oluştu: ', error);
     });
-  }
+    console.log("GET ALL EVENTS GELDİİİİİ");
+  };
 
   const getEvent =() => {
     fetch('http://localhost:57200/api/Calendar', {
