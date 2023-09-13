@@ -10,6 +10,10 @@ import './index.css';
 import { v4 as uuidv4 } from 'uuid';
 import CustomModal from "./components/CustomModal";
 import DateRangePicker from "react-bootstrap-daterangepicker";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpdateIcon from "@mui/icons-material/Update";
 
 
 import {
@@ -36,8 +40,8 @@ export const MyCalendar = () => {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState();
-  const [etkinlikId, setEtkinlikId] = useState();
+  const [endTime, setEndTime] =  useState(new Date());
+  const [etkinlikId, setEtkinlikId] = useState(uuidv4());//uuidv4 parametre olarak verdim
   const [state, setState] = useState({clickInfo: {event: null}});
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -116,8 +120,8 @@ export const MyCalendar = () => {
       const newEvent = {
         id: uuidv4(),
         title: title,
-        start: startTime,
-        end: endTime,
+        start: new Date(startTime),
+        end: new Date(endTime),
       };
   
       setEvents((prevEvents) => [...prevEvents, newEvent]);
@@ -146,15 +150,16 @@ export const MyCalendar = () => {
         }
         //const eventsObj = [];
         //setEvents(eventsObjasd => [...eventsObjasd, newEvent]);
-        console.log(events);
+        console.log("handleDateSelect",events);
 
         setState({ selectInfo, state: "create" });
         console.log("open modal create");
         setStart(selectInfo.start);
         setEnd(selectInfo.end);
-        console.log(selectInfo);
+        console.log("selectInfo: handleDateSelect",selectInfo);
         setStartTime(new Date(selectInfo.start).toISOString().slice(0,-1))
         setEndTime(new Date(selectInfo.end).toISOString().slice(0,-1))
+        console.log("after", selectInfo)
         setShowForm(true);
         console.log("showForm set to true");
         //setModal(true);
@@ -166,6 +171,10 @@ export const MyCalendar = () => {
 
   function handleEvents(events) {
     setCurrentEvents(events);
+  }
+
+  function fixTimes(){
+
   }
 
   function handleEventDrop(clickInfo) {
@@ -262,60 +271,31 @@ export const MyCalendar = () => {
   //     setConfirmModal(true);
 
   // }
-  // function handleDeleteEventClick(event) {
-  //   if (window.confirm(`Etkinliği silmek istediğinizden emin misiniz?`)) {
-  //     deleteEventById(event.eventId);
-  //   }
-  // }
-//   function handleEventClick(clickInfo) {
-
-//     const eventId = clickInfo.event.id;
-//     // console.log("open modal update, delete");
-//     setState({ clickInfo, state: "update" });
-//     // set detail
-//     setTitle(clickInfo.event.title);
-//     setStart(clickInfo.event.start);
-//     setEnd(clickInfo.event.end);
-//     deleteEventById(eventId);
-//     console.log(eventId);
-//     setShowForm(true);
-//     setModal(true);
-// }
-
-  /*function handleEdit() {
-    // console.log(start, end);
-    // state.clickInfo.event.setAllDay(true);
-
-    state.clickInfo.event.setStart(start);
-    state.clickInfo.event.setEnd(end);
-    state.clickInfo.event.mutate({
-      standardProps: { title }
-    });
-    handleClose();
-  }*
-  
-  /*function handleDelete() {
-    // console.log(JSON.stringify(state.clickInfo.event));
-    // console.log(state.clickInfo.event.id);
-    state.clickInfo.event.remove();
-    handleClose();
-  }*/
-
-  /*function handleClose() {
-    setTitle("");
-    setStart(new Date());
-    setEnd(new Date());
-    setState({});
-    setModal(false);
-  }*/
 
   const postData = (e) => {
+
+    //let updStartTime = new Date(startTime);
+    /*let hoursDiff = updStartTime.getHours() - updStartTime.getTimezoneOffset() / 60;
+    let minutesDiff = (updStartTime.getHours() - updStartTime.getTimezoneOffset()) % 60;*/
+    
+    //let updEndTime = new Date(endTime);
+    /*let hoursDiffEnd = updEndTime.getHours() - updEndTime.getTimezoneOffset() / 60;
+    let minutesDiffEnd = (updEndTime.getHours() - updEndTime.getTimezoneOffset()) % 60;*/
+
+    
+    let newStart = new Date(startTime).setHours(new Date(startTime).getHours() + 3);
+    new Date(startTime).setMinutes( new Date(startTime).getMinutes());
+    console.log("upd start time", new Date(newStart));
+    let newEnd = new Date(endTime).setHours(new Date(endTime).getHours() + 3);
+    new Date(endTime).setMinutes(new Date(endTime).getMinutes());
+    console.log("upd end time", endTime);
+
     const dataToSend = {
       title: title,
-      start: new Date(startTime).toISOString().slice(0,-1),
-      end: new Date(endTime).toISOString().slice(0,-1),
+      start: new Date(newStart),
+      end: new Date(newEnd),
     }
-    console.log("zorludeneme",dataToSend )
+    console.log("postData",dataToSend )
     fetch('http://localhost:57200/api/Calendar', {
       method: 'POST',
       headers: {
@@ -357,8 +337,8 @@ export const MyCalendar = () => {
     const updatedEvent = {
       id: state.clickInfo.event.id, // Event ID'si değişmeden kalır
       title: title,
-      start: startTime,
-      end: endTime,
+      start: new Date(startTime).toISOString(),
+      end: new Date(endTime).toISOString(),
     };
   
     fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
@@ -462,13 +442,15 @@ export const MyCalendar = () => {
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
           />
-          <button type="submit" onClick={postData}>Etkinliği Ekle</button>
-          <button type="button" onClick={() => {deleteEventById(state.clickInfo.event)}}> Etkinliği Sil</button>
-          <button type="button" onClick={getAllEvents}>All Events</button>
-          <button type= "button" onClick={updateEvent}>Etkinliği Güncelle</button>
+          <IconButton type="submit" onClick={postData}><AddIcon /></IconButton>
+          <IconButton type="button" onClick={() => {deleteEventById(state.clickInfo.event)}}><DeleteIcon /></IconButton>
+          {/* <button type="button" onClick={getAllEvents}>All Events</button> */}
+          <IconButton type= "button" onClick={updateEvent}> <UpdateIcon /></IconButton>
         </form>
       )}
       <FullCalendar
+        timeZone="UTC"
+        locale="tr"
         editable
         selectable
         dayMaxEvents
@@ -490,8 +472,7 @@ export const MyCalendar = () => {
           //left: "prev next today",
           center: "title",
         }}
-        timeZone="UTC"
-        locale="tr"
+
         plugins={[daygridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
         views={{
           listDay: { buttonText: 'Day List' }, // List Day görünümü için düğme metni
