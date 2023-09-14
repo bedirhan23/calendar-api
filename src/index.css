@@ -56,11 +56,40 @@
 
 }
 .calendarForm{
-  background-color: rgb(207, 188, 80);
+  background-color: #f0e5cc;
   /* garbage, plus, update*/
   /*font-size: 1rem;*/
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
+.fc-scrollgrid-sync-inner{
+  color: red;
+}
+
+.fc-col-header-cell-cushion{
+  color: green;
+}
+
+.fc-listMonth-button {
+  color: pink;
+
+}
+
+.fc-daygrid-day-number{
+  color: green;
+}
+
+.fc-button{
+  color: purple;
+}
+
+.fc-timegrid-slot {
+  color: green;
+
+} /*fc-timegrid-slot-lane*/
+
+fc-timegrid-slot-label-cushion fc-scrollgrid-shrink-cushion
 
 
 .label{
@@ -108,3 +137,5 @@
   background-color: rgb(0, 0, 0); 
   background: transparent;
 } 
+
+td{border: 1px solid black !important;}

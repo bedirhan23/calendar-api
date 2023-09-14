@@ -16,6 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateIcon from "@mui/icons-material/Update";
 
 
+
 import {
   Row,
   Col,
@@ -45,6 +46,7 @@ export const MyCalendar = () => {
   const [state, setState] = useState({clickInfo: {event: null}});
   const [confirmEvent, setConfirmEvent] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [resizingEvent, setResizingEvent] = useState(null);
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -177,25 +179,41 @@ export const MyCalendar = () => {
 
   }
 
-  function handleEventDrop(clickInfo) {
-
-    console.log("dropun içindeyim")
-    console.log(events)
-    if (clickInfo) {
-      console.log(clickInfo)
-      if (
-        window.confirm(
-          `Etkinliği silmek istediğinizden emin misiniz? '${clickInfo.event.title}'`
-        )
-      ) {
-        const updatedEvents = events.filter((event) => {
-          return event !== clickInfo.event;
-        });
+  function handleEventDrop(dropInfo) {
+    const updatedEvent = {
+      id: dropInfo.event.id,
+      title: dropInfo.event.title,
+      start: dropInfo.event.start,
+      end: dropInfo.event.end,
+    };
   
-        setEvents(updatedEvents);
+    fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify(updatedEvent),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Event başarıyla güncellendiğinde yerel state'i güncelle
+          setEvents((prevEvents) =>
+            prevEvents.map((event) =>
+              event.id === updatedEvent.id ? updatedEvent : event
+            )
+          );
+          console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
+          getAllEvents();
+        } else {
+          console.error(`Failed to update event with ID ${updatedEvent.id}.`);
+        }
+        // Modal'ı kapatmak istemiyorsanız aşağıdaki satırı kaldırabilirsiniz.
         setModal(false);
-      }
-    }
+      })
+      .catch((error) => {
+        console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
+      });
   }
   
 
@@ -228,59 +246,37 @@ export const MyCalendar = () => {
   //   updateEvent(updatedEvent);
   // };
 
+  function handleEventResizeStart(resizeInfo) {
+    setResizingEvent(resizeInfo.event);
+  }
+  
+  function handleEventResizeStop() {
+    setResizingEvent(null);
+  }
 
-  // function handleEventResize(event) {
 
-  //   const eventId = event.id;
-  //   console.log("RESIZZE", clickInfo);
-  //   // console.log(checkInfo);
-  //   const updatedEvent = {
-  //     id : state.clickInfo.event.id,
-  //     title: clickInfo.event.title,
-  //     start: clickInfo.event.start,
-  //     end: clickInfo.event.end,
-  //   }
-  //   alert(clickInfo.event.title + " end is now " + clickInfo.event.end.toISOString());
-  //   fetch(`http://localhost:57200/api/Calendar/${updatedEvent.id}`, {
-  //     method: 'PUT',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Access-Control-Allow-Origin': '*',
-  //     },
-  //     body: JSON.stringify(updatedEvent),
-  //   })
-  //     .then((response) => {
-  //       if (response.ok) {
-  //         // Event başarıyla güncellendiğinde yerel state'i güncelle
-  //         setEvents((prevEvents) =>
-  //           prevEvents.map((event) =>
-  //             event.id === updatedEvent.id ? updatedEvent : event
-  //           )
-  //         );
-  //         console.log(`Event with ID ${updatedEvent.id} updated successfully.`);
-  //       } else {
-  //         console.error(`Failed to update event with ID ${updatedEvent.id}.`);
-  //       }
-  //       setModalIsOpen(false); // Modal'ı kapat
-  //     })
-  //     .catch((error) => {
-  //       console.error(`Error updating event with ID ${updatedEvent.id}: `, error);
-  //     });
-  //     updateEvent(updatedEvent);
 
-  //     setConfirmModal(true);
 
-  // }
+  function handleEventResize(event) {
+    if (resizingEvent) {
+      // Etkinlik yeniden boyutlandırma işlemi burada gerçekleştirilir
+      const updatedEvent = {
+        id: resizingEvent.id,
+        title: resizingEvent.title,
+        start: event.start,
+        end: event.end,
+      };
+  
+      // Daha sonra güncellenmiş etkinliği sunucuya gönderme işlemi burada yapılır
+  
+      // resizingEvent'i sıfırlayın
+      setResizingEvent(null);
+    }
+  }
+  
 
   const postData = (e) => {
 
-    //let updStartTime = new Date(startTime);
-    /*let hoursDiff = updStartTime.getHours() - updStartTime.getTimezoneOffset() / 60;
-    let minutesDiff = (updStartTime.getHours() - updStartTime.getTimezoneOffset()) % 60;*/
-    
-    //let updEndTime = new Date(endTime);
-    /*let hoursDiffEnd = updEndTime.getHours() - updEndTime.getTimezoneOffset() / 60;
-    let minutesDiffEnd = (updEndTime.getHours() - updEndTime.getTimezoneOffset()) % 60;*/
 
     
     let newStart = new Date(startTime).setHours(new Date(startTime).getHours() + 3);
@@ -308,6 +304,8 @@ export const MyCalendar = () => {
       console.log("response icindeyim")
       if (response.ok){
         console.log("Etkinlik başarıyla oluşturuldu.");
+        getAllEvents();
+
       } else {
         console.error("Etkinlik oluşturulurken hata oldu.");
       }
@@ -445,7 +443,8 @@ export const MyCalendar = () => {
 
  return (
     <div className="calendarForm">
-      <h1>My Calendar</h1>
+
+      <h1 >&nbsp;My Calendar</h1>
       {showForm && (
         <form onSubmit={handleFormSubmit}>
           <input
@@ -478,12 +477,20 @@ export const MyCalendar = () => {
         editable
         selectable
         dayMaxEvents
+        eventDisplay="block"
         events={events}
+        eventColor="#74481c"
+        eventBorderColor= "black"
+        eventTextColor="white"
         select={handleDateSelect}
         eventDrop={handleEventDrop}
         eventClick={handleEventClick}
         dateClick={handleDateClick}
+        
+        eventResizeStart={handleEventResizeStart}
+        eventResizeStop={handleEventResizeStop}
         //eventResize={handleEventResize}
+        eventResize={handleEventResize}
         //slotWidth={0.5}
         //height={'80%'}
         //windowResize={'50%'}
@@ -495,6 +502,13 @@ export const MyCalendar = () => {
           end: "dayGridMonth timeGridWeek timeGridDay",
           //left: "prev next today",
           center: "title",
+        }}
+
+        buttonText={{
+          today:"today",
+          month: "month",
+          week: "week",
+          day: "day",
         }}
 
         plugins={[daygridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
