@@ -34,8 +34,9 @@
   flex-direction: column;
   align-items: center;
   border-radius: 5px;
-  width: 30%;
-  height: 50vh;
+  width: 40%;
+  height: 60vh;
+  /*margin: auto;*/
  
 
 }
@@ -52,6 +53,7 @@
   width: 30%;
   height: 50vh;
   /*background-color: rgb(235, 183, 29);*/
+  /*margin: auto;*/
 
 
 }
@@ -64,7 +66,7 @@
 }
 
 .fc-scrollgrid-sync-inner{
-  color: red;
+  color: green  ;
 }
 
 .fc-col-header-cell-cushion{
@@ -80,8 +82,24 @@
   color: green;
 }
 
+.fc-list-day-text{
+  color: green;
+}
+
+.fc-list-day-side-text{
+  color: green;
+}
+
 .fc-button{
   color: purple;
+}
+
+.fc-list-day-cushion{
+  color: green;
+}
+
+.fc-cell-shaded{
+  color: green;
 }
 
 .fc-timegrid-slot {
@@ -118,14 +136,16 @@ fc-timegrid-slot-label-cushion fc-scrollgrid-shrink-cushion
   padding: 15px;
   border-radius: 10px;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .linkBtn{
-  background: rgb(201, 135, 43);
+  background: rgb(201, 135, 43);  
   color: rgb(255, 255, 255);
   text-decoration: underline;
   width: 50vh;
   height: 5vh;
+  display: inline-block;
 }
 
 .input-container2{
